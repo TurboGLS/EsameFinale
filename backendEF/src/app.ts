@@ -8,13 +8,28 @@ import { errorHandlers } from './errors';
 
 const app = express();
 
-app.use(cors());
+const allowedOrigins = [
+  process.env.FRONTEND_URL, // URL del frontend deployato (da .env)
+  'http://localhost:4200',  // frontend Angular in locale
+];
+
+app.use(cors({
+  origin: (origin, callback) => {
+    // Consenti richieste senza origine (es. Postman/curl) o da origini in whitelist
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  optionsSuccessStatus: 200,
+}));
+
 app.use(morgan('tiny'));
 app.use(bodyParser.json());
 
 app.use('/api', apiRouter);
 
 app.use(errorHandlers);
-
 
 export default app;

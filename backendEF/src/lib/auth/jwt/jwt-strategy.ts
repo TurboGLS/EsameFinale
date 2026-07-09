@@ -2,7 +2,7 @@ import passport from "passport";
 import { ExtractJwt, Strategy as JwtStrategy } from "passport-jwt";
 import { UserModel } from "../../../api/user/user.model";
 
-export const JWT_SECRET = 'my_jwt_secret';
+export const JWT_SECRET = process.env.JWT_SECRET || 'my_jwt_secret';
 passport.use(
     new JwtStrategy({
         jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
