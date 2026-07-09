@@ -4,6 +4,7 @@ import { JwtService } from "./jwt.service";
 import { Router } from "@angular/router";
 import { catchError, distinctUntilChanged, map, of, ReplaySubject, tap } from "rxjs";
 import { User } from "../entities/user.entity";
+import { environment } from "../../enviroments/enviroments";
 
 @Injectable({
     providedIn: 'root'
@@ -27,7 +28,7 @@ export class AuthService {
     }
 
     login(username: string, password: string) {
-        return this.http.post<any>('/api/login', { username, password })
+        return this.http.post<any>(`${environment.apiUrl}/login`, { username, password })
             .pipe(
                 tap(res => this.jwtSrv.setToken(res.token)),
                 tap(res => this._currentUser$.next(res.user)),
@@ -36,7 +37,7 @@ export class AuthService {
     }
 
     fetchUser() {
-        return this.http.get<User>('/api/users/me')
+        return this.http.get<User>(`${environment.apiUrl}/users/me`)
             .pipe(
                 catchError(_ => {
                     return of(null);
@@ -51,6 +52,6 @@ export class AuthService {
     }
 
     register(firstName: string, lastName: string, picture: string, username: string, password: string) {
-        return this.http.post('/api/register', { username, password, picture, firstName, lastName });
+        return this.http.post(`${environment.apiUrl}/register`, { username, password, picture, firstName, lastName });
     }
 }
