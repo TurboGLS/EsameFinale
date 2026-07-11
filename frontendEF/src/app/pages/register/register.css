@@ -1,0 +1,115 @@
+.register-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background: #ffffff;
+}
+
+.register-card {
+  width: 100%;
+  max-width: 460px;
+  background: #fff;
+  border: 1px solid #ececef;
+  border-radius: 1rem;
+  padding: 2.5rem 2rem;
+  box-shadow: 0 10px 30px rgba(17, 24, 39, 0.08);
+}
+
+.register-header {
+  text-align: center;
+  margin-bottom: 1.75rem;
+}
+
+.register-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  color: #fff;
+  margin-bottom: 1rem;
+}
+
+.register-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.register-subtitle {
+  color: #6b7280;
+  font-size: 0.95rem;
+  margin-bottom: 0;
+}
+
+.register-form .form-label {
+  font-weight: 500;
+}
+
+.register-form .form-control:focus {
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 0.2rem rgba(124, 58, 237, 0.2);
+}
+
+/* occhietto interno al campo password */
+.password-field {
+  position: relative;
+}
+
+.password-field .form-control {
+  padding-right: 3rem;
+}
+
+.password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 0.6rem;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: #6b7280;
+  padding: 0.25rem;
+  cursor: pointer;
+  line-height: 0;
+}
+
+.password-toggle:hover {
+  color: #111827;
+}
+
+.register-form .btn-primary {
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  border: none;
+  font-weight: 600;
+  padding-block: 0.6rem;
+  transition: opacity 0.15s ease;
+}
+
+.register-form .btn-primary:hover {
+  opacity: 0.9;
+}
+
+.register-footer {
+  text-align: center;
+  margin-top: 1.5rem;
+  margin-bottom: 0;
+  color: #6b7280;
+  font-size: 0.95rem;
+}
+
+.register-footer a {
+  color: #7c3aed;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.register-footer a:hover {
+  text-decoration: underline;
+}

@@ -28,6 +28,8 @@ export class RegisterComponent implements OnInit, OnDestroy{
 
   registerError = '';
 
+  showPassword = false;
+
   requestedURL: string | null = null;
 
 
@@ -50,6 +52,10 @@ export class RegisterComponent implements OnInit, OnDestroy{
   ngOnDestroy(): void {
     this.destroyed$.next();
     this.destroyed$.complete();
+  }
+
+  togglePassword() {
+    this.showPassword = !this.showPassword;
   }
 
   register() {

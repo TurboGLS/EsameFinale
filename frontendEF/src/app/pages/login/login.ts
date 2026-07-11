@@ -26,6 +26,8 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   loginError = '';
 
+  showPassword = false;
+
   requestedUrl: string | null = null;
 
   ngOnInit() {
@@ -48,6 +50,14 @@ export class LoginComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroyed$.next();
     this.destroyed$.complete();
+  }
+
+  togglePassword() {
+    this.showPassword = !this.showPassword;
+  }
+
+  goToRegister() {
+    this.router.navigate(['/register']);
   }
 
   login() {
