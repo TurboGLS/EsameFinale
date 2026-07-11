@@ -47,7 +47,7 @@ export class AuthService {
             );
     }
 
-      // Richiama /api/refresh per ottenere nuovi token.
+    // Richiama /api/refresh per ottenere nuovi token.
     // Se più chiamate richiedono il refresh nello stesso momento,
     // condividono lo stesso observable (shareReplay) evitando race condition.
     refresh(): Observable<{ token: string; refreshToken: string }> {
