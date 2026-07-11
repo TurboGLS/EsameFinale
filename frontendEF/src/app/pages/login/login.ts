@@ -1,8 +1,9 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
+import { ToastService } from '../../services/toast.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { catchError, map, Subject, takeUntil, throwError } from 'rxjs';
+import { catchError, finalize, map, Subject, takeUntil, throwError } from 'rxjs';
 
 @Component({
   selector: 'app-login',
@@ -14,6 +15,7 @@ import { catchError, map, Subject, takeUntil, throwError } from 'rxjs';
 export class LoginComponent implements OnInit, OnDestroy {
   protected fb = inject(FormBuilder);
   protected authSrv = inject(AuthService);
+  protected toastSrv = inject(ToastService);
   protected router = inject(Router);
   protected activatedRoute = inject(ActivatedRoute);
 
@@ -24,19 +26,13 @@ export class LoginComponent implements OnInit, OnDestroy {
     password: ['', Validators.required]
   });
 
-  loginError = '';
-
   showPassword = false;
+
+  loading = false;
 
   requestedUrl: string | null = null;
 
   ngOnInit() {
-    this.loginForm.valueChanges
-      .pipe(takeUntil(this.destroyed$))
-      .subscribe(_ => {
-        this.loginError = '';
-      });
-
     this.activatedRoute.queryParams
       .pipe(
         takeUntil(this.destroyed$),
@@ -61,15 +57,28 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   login() {
+    // evito submit multipli mentre la richiesta è in corso
+    if (this.loading) {
+      return;
+    }
+    this.loading = true;
+
     const { username, password } = this.loginForm.value;
     this.authSrv.login(username!, password!)
       .pipe(
         catchError(response => {
-          this.loginError = response.error.message;
+          // 401 = credenziali non valide: messaggio sempre generico.
+          // Altri status (es. 500) mostrano un errore generico di servizio.
+          const message = response.status === 401
+            ? 'Credenziali errate'
+            : 'Impossibile effettuare l\'accesso. Riprova più tardi.';
+          this.toastSrv.error(message, 'Accesso non riuscito');
           return throwError(() => response);
-        })
+        }),
+        finalize(() => this.loading = false)
       )
       .subscribe(() => {
+        this.toastSrv.success('Accesso effettuato con successo.', 'Bentornato');
         this.router.navigate([this.requestedUrl ? this.requestedUrl : '/']);
       })
   }

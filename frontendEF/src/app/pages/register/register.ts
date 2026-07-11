@@ -1,8 +1,9 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { catchError, map, Subject, takeUntil, throwError } from 'rxjs';
+import { catchError, finalize, map, Subject, takeUntil, throwError } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-register',
@@ -16,6 +17,7 @@ export class RegisterComponent implements OnInit, OnDestroy{
   protected destroyed$ = new Subject<void>();
   protected activatedRoute = inject(ActivatedRoute);
   protected authSrv = inject(AuthService);
+  protected toastSrv = inject(ToastService);
   protected router = inject(Router);
 
   registerFrom = this.fb.group({
@@ -26,19 +28,14 @@ export class RegisterComponent implements OnInit, OnDestroy{
     password: ['', Validators.minLength(8)]
   });
 
-  registerError = '';
-
   showPassword = false;
+
+  loading = false;
 
   requestedURL: string | null = null;
 
 
   ngOnInit() {
-    this.registerFrom.valueChanges
-      .pipe(takeUntil(this.destroyed$))
-      .subscribe(_ => {
-        this.registerError = '';
-      })
       this.activatedRoute.queryParams
         .pipe(
           takeUntil(this.destroyed$),
@@ -59,16 +56,28 @@ export class RegisterComponent implements OnInit, OnDestroy{
   }
 
   register() {
+    // evito submit multipli mentre la richiesta è in corso
+    if (this.loading) {
+      return;
+    }
+    this.loading = true;
+
     const { firstName, lastName, picture, username, password } = this.registerFrom.value;
     this.authSrv.register(firstName!, lastName!, picture!, username!, password!)
       .pipe(
         catchError(response => {
-          this.registerError = response.error.message;
+          this.toastSrv.error(response.error?.message ?? 'Impossibile completare la registrazione.', 'Registrazione non riuscita');
           return throwError(() => response);
-        })
+        }),
+        finalize(() => this.loading = false)
       )
       .subscribe(() => {
-        this.router.navigate([this.requestedURL ? this.requestedURL : '/']);
+        this.toastSrv.success('Registrazione avvenuta con successo. Ora puoi accedere.', 'Account creato');
+        // Dopo la registrazione l'utente non è ancora autenticato:
+        // lo mando al login (inoltrando la requestedURL se presente).
+        this.router.navigate(['/login'], {
+          queryParams: this.requestedURL ? { requestedUrl: this.requestedURL } : {}
+        });
       })
   }
 }

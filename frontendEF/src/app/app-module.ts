@@ -9,6 +9,8 @@ import { LoginComponent } from './pages/login/login';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NavbarComponent } from './components/navbar/navbar';
 import { NavUserComponent } from './components/nav-user/nav-user';
+import { ToastComponent } from './components/toast/toast';
+import { ToastContainerComponent } from './pages/toast-container/toast-container';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { authInterceptor } from './interceptors/auth-interceptor';
 import { logoutInterceptor } from './interceptors/logout-interceptor';
@@ -18,8 +20,10 @@ import { logoutInterceptor } from './interceptors/logout-interceptor';
     App, 
     RegisterComponent, 
     LoginComponent, 
-    NavbarComponent, 
-    NavUserComponent
+    NavbarComponent,
+    NavUserComponent,
+    ToastComponent,
+    ToastContainerComponent
   ],
   imports: [
     BrowserModule, 
