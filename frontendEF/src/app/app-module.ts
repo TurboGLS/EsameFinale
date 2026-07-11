@@ -1,4 +1,4 @@
-import { NgModule, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { NgModule, provideBrowserGlobalErrorListeners, provideZoneChangeDetection } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing-module';
@@ -9,6 +9,9 @@ import { LoginComponent } from './pages/login/login';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NavbarComponent } from './components/navbar/navbar';
 import { NavUserComponent } from './components/nav-user/nav-user';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { authInterceptor } from './interceptors/auth-interceptor';
+import { logoutInterceptor } from './interceptors/logout-interceptor';
 
 @NgModule({
   declarations: [
@@ -24,7 +27,10 @@ import { NavUserComponent } from './components/nav-user/nav-user';
     NgbModule, 
     FormsModule, 
     ReactiveFormsModule],
-  providers: [provideBrowserGlobalErrorListeners()],
+  providers: [
+    provideBrowserGlobalErrorListeners(),
+    provideHttpClient(withInterceptors([authInterceptor, logoutInterceptor]))
+  ],
   bootstrap: [App],
 })
 export class AppModule {}

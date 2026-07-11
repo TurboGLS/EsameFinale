@@ -2,7 +2,7 @@ import { HttpClient } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { JwtService } from "./jwt.service";
 import { Router } from "@angular/router";
-import { catchError, distinctUntilChanged, map, of, ReplaySubject, tap } from "rxjs";
+import { catchError, distinctUntilChanged, finalize, map, Observable, of, ReplaySubject, shareReplay, tap, throwError } from "rxjs";
 import { User } from "../entities/user.entity";
 import { environment } from "../../enviroments/enviroments";
 
@@ -17,6 +17,10 @@ export class AuthService {
     protected _currentUser$ = new ReplaySubject<User | null>(1);
     currentUser$ = this._currentUser$.asObservable();
 
+    // Unico observable condiviso per il refresh: evita race condition
+    // quando più chiamate falliscono con 401 contemporaneamente.
+    private refreshInProgress$: Observable<{ token: string; refreshToken: string }> | null = null;
+
     isAuthenticated$ = this.currentUser$
         .pipe(
             map(user => !!user),
@@ -24,16 +28,51 @@ export class AuthService {
         );
 
     constructor() {
-        this.fetchUser().subscribe();
+        const tokenValid = this.jwtSrv.areTokensValid();
+        if (!tokenValid) {
+            this.logout();
+        } else {
+            const user = this.jwtSrv.getPayload<User>();
+            this._currentUser$.next(user);
+        }
     }
 
+    // richiamo api per effettuare il login
     login(username: string, password: string) {
         return this.http.post<any>(`${environment.apiUrl}/login`, { username, password })
             .pipe(
-                tap(res => this.jwtSrv.setToken(res.token)),
+                tap(res => this.jwtSrv.setToken(res.token, res.refreshToken)),
                 tap(res => this._currentUser$.next(res.user)),
                 map(res => res.user)
             );
+    }
+
+      // Richiama /api/refresh per ottenere nuovi token.
+    // Se più chiamate richiedono il refresh nello stesso momento,
+    // condividono lo stesso observable (shareReplay) evitando race condition.
+    refresh(): Observable<{ token: string; refreshToken: string }> {
+        const authTokens = this.jwtSrv.getToken();
+        if (!authTokens) {
+            return throwError(() => new Error('Missing refresh token'));
+        }
+
+        if (this.refreshInProgress$) {
+            return this.refreshInProgress$;
+        }
+
+        this.refreshInProgress$ = this.http
+            .post<{ token: string; refreshToken: string }>(`${environment.apiUrl}/refresh`, { refreshToken: authTokens.refreshToken })
+            .pipe(
+                tap(res => this.jwtSrv.setToken(res.token, res.refreshToken)),
+                tap(() => {
+                    const user = this.jwtSrv.getPayload<User>();
+                    this._currentUser$.next(user);
+                }),
+                finalize(() => { this.refreshInProgress$ = null; }),
+                shareReplay(1)
+            );
+
+        return this.refreshInProgress$;
     }
 
     fetchUser() {
@@ -51,7 +90,7 @@ export class AuthService {
         this._currentUser$.next(null);
     }
 
-    register(firstName: string, lastName: string, picture: string, username: string, password: string) {
-        return this.http.post(`${environment.apiUrl}/register`, { username, password, picture, firstName, lastName });
+    register(firstName: string, lastName: string, username: string, password: string, confirmPassword: string) {
+        return this.http.post(`${environment.apiUrl}/register`, { firstName, lastName, username, password, confirmPassword });
     }
 }

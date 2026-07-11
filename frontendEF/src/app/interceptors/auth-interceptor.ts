@@ -1,18 +1,17 @@
-import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
-import { inject } from '@angular/core';
-import { Router } from '@angular/router';
-import { catchError, throwError } from 'rxjs';
-import { AuthService } from '../services/auth.service';
+import { inject } from "@angular/core";
+import { JwtService } from "../services/jwt.service";
+import { HttpHandlerFn, HttpRequest } from "@angular/common/http";
 
-export const logoutInterceptor: HttpInterceptorFn = (req, next) => {
-  const authSrv = inject(AuthService);
-
-  return next(req).pipe(
-    catchError((response: any) => {
-      if (response instanceof HttpErrorResponse && response.status === 401) {
-        authSrv.logout();
-      }
-      return throwError(() => response);
-    })
-  )
-};
+export function authInterceptor(req: HttpRequest<unknown>, next: HttpHandlerFn) {
+  // Inject del JwtService e uso la funzione per ottenere i tokens
+  const authTokens = inject(JwtService).getToken();
+  // clono la richiesta per aggiugere l'authentication header
+  if (authTokens) {
+    const newReq = req.clone({
+      headers: req.headers.set('Authorization', `Bearer ${authTokens.token}`),
+    });
+    return next(newReq);
+  } else {
+    return next(req);
+  }
+}
