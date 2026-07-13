@@ -51,7 +51,7 @@
         </div>
       </div>
 
-      <button type="submit" class="btn btn-primary btn-lg w-100" [disabled]="loading">
+      <button type="submit" class="btn btn-primary btn-lg w-100" [disabled]="loading || registerFrom.invalid">
         <span *ngIf="loading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
         {{ loading ? 'Registrazione in corso...' : 'Register' }}
       </button>

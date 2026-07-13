@@ -24,8 +24,13 @@ export class RegisterComponent implements OnInit, OnDestroy{
     firstName: new FormControl<string | null>(''),
     lastName: new FormControl<string | null>(''),
     picture: ['', Validators.required],
-    username: ['', Validators.required],
-    password: ['', Validators.minLength(8)]
+    // username deve essere una email (come richiesto dal backend)
+    username: ['', [Validators.required, Validators.email]],
+    // password forte: min 8 caratteri con maiuscola, minuscola, numero e simbolo
+    password: ['', [
+      Validators.required,
+      Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/)
+    ]]
   });
 
   showPassword = false;
