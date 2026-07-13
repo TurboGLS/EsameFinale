@@ -90,7 +90,7 @@ export class AuthService {
         this._currentUser$.next(null);
     }
 
-    register(firstName: string, lastName: string, username: string, password: string, confirmPassword: string) {
-        return this.http.post(`${environment.apiUrl}/register`, { firstName, lastName, username, password, confirmPassword });
+    register(firstName: string, lastName: string, picture: string, username: string, password: string) {
+        return this.http.post(`${environment.apiUrl}/register`, { firstName, lastName, picture, username, password });
     }
 }
