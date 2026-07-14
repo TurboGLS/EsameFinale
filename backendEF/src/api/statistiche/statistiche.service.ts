@@ -40,7 +40,7 @@ export class StatisticheService {
             const nomeCategoria = categoria?.nomeCategoria;
             const mese = new Date(a.dataAssegnazione).toISOString().slice(0, 7);
 
-            // applico i filtri per categoria (per id, come nel resto dell'app) e per mese
+            // applico i filtri per categoria per id e per mese
             if (filters.categoria && categoria?.id !== filters.categoria) {
                 continue;
             }
