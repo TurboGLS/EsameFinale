@@ -9,7 +9,7 @@ export const me = async (
         res.json(req.user);
     }
 
-// elenco dipendenti (riservato al referente Academy)
+// elenco dipendenti solo per i referenti
 export const getDipendenti = async (
     req: Request,
     res: Response,

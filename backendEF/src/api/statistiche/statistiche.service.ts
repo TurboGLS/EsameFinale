@@ -1,5 +1,6 @@
-import mongoose, { PipelineStage } from "mongoose";
 import { AssegnazioneModel } from "../assegnazione/assegnazione.model";
+import { Corso } from "../corso/corso.entity";
+import { Categoria } from "../categoria/categoria.entity";
 
 export type StatisticheFilters = {
     mese?: string;
@@ -19,71 +20,61 @@ export class StatisticheService {
 
     // riepilogo dei corsi assegnati e completati aggregati per mese e categoria
     async academy(filters: StatisticheFilters): Promise<RigaStatistica[]> {
-        const pipeline: PipelineStage[] = [];
-
-        // metto che assegnazioni annullate sono escluse dal conteggio
-        const initialMatch: Record<string, any> = { stato: { $ne: 'Annullato' } };
+        // faccio che le assegnazioni annullate sono escluse dal conteggio
+        const query: Record<string, any> = { stato: { $ne: 'Annullato' } };
         if (filters.dipendente) {
-            initialMatch.dipendente = new mongoose.Types.ObjectId(filters.dipendente);
-        }
-        pipeline.push({ $match: initialMatch });
-
-        // join con corso e con la relativa categoria con query di mongo
-        pipeline.push(
-            { $lookup: { from: 'corsos', localField: 'corso', foreignField: '_id', as: 'corso' } },
-            { $unwind: '$corso' },
-            { $lookup: { from: 'categorias', localField: 'corso.categoria', foreignField: '_id', as: 'categoria' } },
-            { $unwind: '$categoria' }
-        );
-
-        // inserisco il filtro per nome categoria
-        if (filters.categoria) {
-            pipeline.push({ $match: { 'categoria.nomeCategoria': filters.categoria } });
+            query.dipendente = filters.dipendente;
         }
 
-        // ricavo il mese dalla data di assegnazione
-        pipeline.push({
-            $addFields: {
-                mese: { $dateToString: { format: '%Y-%m', date: '$dataAssegnazione' } }
-            }
-        });
+        // recupero le assegnazioni con corso e categoria popolati
+        const assegnazioni = await AssegnazioneModel.find(query)
+            .populate({ path: 'corso', populate: { path: 'categoria' } });
 
-        // filtro per mese o periodo
-        if (filters.mese) {
-            pipeline.push({ $match: { mese: filters.mese } });
+        // raggruppo in memoria per chiave "mese|categoria"
+        const gruppi = new Map<string, RigaStatistica>();
+
+        for (const doc of assegnazioni) {
+            const a = doc.toObject();
+            const corso = a.corso as Corso;
+            const categoria = corso?.categoria as Categoria;
+            const nomeCategoria = categoria?.nomeCategoria;
+            const mese = new Date(a.dataAssegnazione).toISOString().slice(0, 7);
+
+            // applico i filtri per categoria (per id, come nel resto dell'app) e per mese
+            if (filters.categoria && categoria?.id !== filters.categoria) {
+                continue;
+            }
+            if (filters.mese && mese !== filters.mese) {
+                continue;
+            }
+
+            const chiave = `${mese}|${nomeCategoria}`;
+            if (!gruppi.has(chiave)) {
+                gruppi.set(chiave, {
+                    mese,
+                    categoria: nomeCategoria,
+                    numeroAssegnazioni: 0,
+                    numeroCompletamenti: 0,
+                    percentualeCompletamento: 0,
+                });
+            }
+
+            const riga = gruppi.get(chiave)!;
+            riga.numeroAssegnazioni++;
+            if (a.stato === 'Completato') {
+                riga.numeroCompletamenti++;
+            }
         }
 
-        // raggruppo per mese, categoria e conto assegnazioni e completamenti
-        pipeline.push({
-            $group: {
-                _id: { mese: '$mese', categoria: '$categoria.nomeCategoria' },
-                numeroAssegnazioni: { $sum: 1 },
-                numeroCompletamenti: {
-                    $sum: { $cond: [{ $eq: ['$stato', 'Completato'] }, 1, 0] }
-                }
-            }
-        });
-
-        pipeline.push({
-            $project: {
-                _id: 0,
-                mese: '$_id.mese',
-                categoria: '$_id.categoria',
-                numeroAssegnazioni: 1,
-                numeroCompletamenti: 1,
-                percentualeCompletamento: {
-                    $cond: [
-                        { $eq: ['$numeroAssegnazioni', 0] },
-                        0,
-                        { $round: [{ $multiply: [{ $divide: ['$numeroCompletamenti', '$numeroAssegnazioni'] }, 100] }, 2] }
-                    ]
-                }
-            }
-        });
-
-        pipeline.push({ $sort: { mese: 1, categoria: 1 } });
-
-        return AssegnazioneModel.aggregate<RigaStatistica>(pipeline);
+        // ora calcolo la percentuale di completamento e ordino per mese e categoria
+        return Array.from(gruppi.values())
+            .map(riga => ({
+                ...riga,
+                percentualeCompletamento: riga.numeroAssegnazioni === 0
+                    ? 0
+                    : Math.round((riga.numeroCompletamenti / riga.numeroAssegnazioni) * 100 * 100) / 100,
+            }))
+            .sort((a, b) => a.mese.localeCompare(b.mese) || a.categoria.localeCompare(b.categoria));
     }
 }
 

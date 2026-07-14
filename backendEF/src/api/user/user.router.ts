@@ -5,7 +5,7 @@ import { me, getDipendenti } from "./user.controller";
 const router = Router();
 
 router.get('/me', isAuthenticated, me);
-// elenco dipendenti: solo il referente Academy può consultarlo
+
 router.get('/dipendenti', isAuthenticated, hasRole('REFERENTE'), getDipendenti);
 
 export default router;

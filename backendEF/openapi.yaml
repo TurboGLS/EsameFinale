@@ -476,7 +476,7 @@ paths:
           name: categoria
           schema:
             type: string
-          description: Nome della categoria
+          description: Id della categoria
         - in: query
           name: dipendente
           schema:

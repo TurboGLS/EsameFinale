@@ -5,8 +5,7 @@ import { Ruolo } from "../../api/user/user.entity";
 // verifica che la richiesta abbia un JWT valido
 export const isAuthenticated = passport.authenticate('jwt', { session: false });
 
-// verifica che l'utente autenticato abbia uno dei ruoli consentiti.
-// Va usato SEMPRE dopo isAuthenticated, così req.user è già valorizzato.
+// verifica che l'utente autenticato abbia uno dei ruoli giusti
 export const hasRole = (...ruoli: Ruolo[]) => {
     return (req: Request, res: Response, next: NextFunction) => {
         const user = req.user;

@@ -18,7 +18,6 @@ export class UserService {
         if (existingIdentity) {
             throw new UserExistsError();
         }
-        // l'email dell'utente coincide con lo username (email) usato per l'accesso
         const newUser = await UserModel.create({ ...user, email: credentials.username });
 
         const hashedPassword = await bcrypt.hash(credentials.password, 10);
@@ -40,7 +39,6 @@ export class UserService {
         return user ? user.toObject() : null;
     }
 
-    // elenco dei dipendenti: usato dal referente per assegnare i corsi
     async getDipendenti(): Promise<User[]> {
         const dipendenti = await UserModel.find({ ruolo: 'DIPENDENTE' }).sort({ firstName: 1, lastName: 1 });
         return dipendenti.map(d => d.toObject());
