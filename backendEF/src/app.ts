@@ -4,13 +4,18 @@ import cors from 'cors';
 import bodyParser from 'body-parser';
 import './lib/auth/auth.handlers';
 import apiRouter from './api/routes';
+import { setupSwagger } from './swagger';
 import { errorHandlers } from './errors';
 
 const app = express();
 
+const PORT = process.env.PORT || 3000;
+
 const allowedOrigins = [
-  process.env.FRONTEND_URL, // URL del frontend deployato (da .env)
-  'http://localhost:4200',  // frontend Angular in locale
+  process.env.FRONTEND_URL,            // URL del frontend deployato (da .env)
+  process.env.BACKEND_URL,             // URL del backend deployato (da .env)
+  'http://localhost:4200',             // frontend Angular in locale
+  `http://localhost:${PORT}`,          // backend stesso: serve a Swagger UI
 ];
 
 app.use(cors({
@@ -27,6 +32,9 @@ app.use(cors({
 
 app.use(morgan('tiny'));
 app.use(bodyParser.json());
+
+// documentazione API interattiva (Swagger UI) -> /api/docs
+setupSwagger(app);
 
 app.use('/api', apiRouter);
 

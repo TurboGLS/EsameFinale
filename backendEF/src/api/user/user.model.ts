@@ -1,9 +1,13 @@
 import { Schema, model } from 'mongoose';
-import { User } from './user.entity';
+import { RUOLI, User } from './user.entity';
 
 const userSchema = new Schema<User>({
     firstName: String,
     lastName: String,
+    // email univoca dell'utente (coincide con lo username usato per l'accesso)
+    email: { type: String, required: true, unique: true },
+    // ruolo applicativo: di default un nuovo utente registrato è un DIPENDENTE
+    ruolo: { type: String, enum: RUOLI, default: 'DIPENDENTE', required: true },
     picture: String
 })
 

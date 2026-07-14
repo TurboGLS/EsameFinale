@@ -1,10 +1,11 @@
 import { Router } from "express";
-import { validate } from "../../lib/validation-middleware";
-import { isAuthenticated } from "../../lib/auth/auth.middlware";
-import { me } from "./user.controller";
+import { isAuthenticated, hasRole } from "../../lib/auth/auth.middlware";
+import { me, getDipendenti } from "./user.controller";
 
 const router = Router();
 
-router.get('/me', isAuthenticated, me)
+router.get('/me', isAuthenticated, me);
+// elenco dipendenti: solo il referente Academy può consultarlo
+router.get('/dipendenti', isAuthenticated, hasRole('REFERENTE'), getDipendenti);
 
 export default router;

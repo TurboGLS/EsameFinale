@@ -1,0 +1,681 @@
+openapi: 3.0.3
+info:
+  title: Academy aziendale - API
+  version: 1.0.0
+  description: >
+    API per la gestione dei percorsi formativi interni (Academy aziendale).
+    Autenticazione tramite JWT (Bearer token). I ruoli previsti sono
+    DIPENDENTE e REFERENTE (referente Academy).
+
+servers:
+  - url: http://localhost:3000/api
+    description: Server locale
+
+tags:
+  - name: Auth
+    description: Registrazione, login e refresh token
+  - name: Utenti
+    description: Profilo ed elenco dipendenti
+  - name: Categorie
+    description: Categorie dei corsi
+  - name: Corsi
+    description: Catalogo dei corsi Academy
+  - name: Assegnazioni
+    description: Assegnazione dei corsi ai dipendenti
+  - name: Statistiche
+    description: Riepiloghi e statistiche sui completamenti
+
+security:
+  - bearerAuth: []
+
+paths:
+  /register:
+    post:
+      tags: [Auth]
+      summary: Registrazione di un nuovo utente (ruolo DIPENDENTE)
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '200':
+          description: Utente creato
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Dati non validi o username già in uso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /login:
+    post:
+      tags: [Auth]
+      summary: Login utente
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Autenticazione riuscita
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '401':
+          description: Credenziali errate
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /refresh:
+    post:
+      tags: [Auth]
+      summary: Rinnovo della coppia di token
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [refreshToken]
+              properties:
+                refreshToken:
+                  type: string
+      responses:
+        '200':
+          description: Nuova coppia di token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                  refreshToken:
+                    type: string
+        '401':
+          description: Refresh token non valido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /users/me:
+    get:
+      tags: [Utenti]
+      summary: Profilo dell'utente autenticato
+      responses:
+        '200':
+          description: Utente corrente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Non autenticato
+
+  /users/dipendenti:
+    get:
+      tags: [Utenti]
+      summary: Elenco dei dipendenti (solo referente)
+      responses:
+        '200':
+          description: Elenco dipendenti
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '403':
+          description: Operazione non consentita per il ruolo
+
+  /categorie:
+    get:
+      tags: [Categorie]
+      summary: Elenco delle categorie
+      responses:
+        '200':
+          description: Elenco categorie
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Categoria'
+    post:
+      tags: [Categorie]
+      summary: Crea una categoria (solo referente)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [nomeCategoria]
+              properties:
+                nomeCategoria:
+                  type: string
+      responses:
+        '201':
+          description: Categoria creata
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Categoria'
+        '403':
+          description: Operazione non consentita per il ruolo
+
+  /corsi:
+    get:
+      tags: [Corsi]
+      summary: Elenco dei corsi con filtri opzionali
+      parameters:
+        - in: query
+          name: categoria
+          schema:
+            type: string
+          description: Id della categoria
+        - in: query
+          name: attivo
+          schema:
+            type: boolean
+          description: Filtra per stato attivo/non attivo
+      responses:
+        '200':
+          description: Elenco corsi
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Corso'
+    post:
+      tags: [Corsi]
+      summary: Crea un corso (solo referente)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CorsoInput'
+      responses:
+        '201':
+          description: Corso creato
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Corso'
+        '400':
+          description: Dati non validi
+        '403':
+          description: Operazione non consentita per il ruolo
+
+  /corsi/{id}:
+    get:
+      tags: [Corsi]
+      summary: Dettaglio di un corso
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Corso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Corso'
+        '404':
+          description: Corso non trovato
+    put:
+      tags: [Corsi]
+      summary: Modifica un corso (solo referente)
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CorsoInput'
+      responses:
+        '200':
+          description: Corso aggiornato
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Corso'
+        '403':
+          description: Operazione non consentita per il ruolo
+        '404':
+          description: Corso non trovato
+    delete:
+      tags: [Corsi]
+      summary: Elimina un corso (solo referente, se senza assegnazioni)
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '204':
+          description: Corso eliminato
+        '403':
+          description: Operazione non consentita per il ruolo
+        '404':
+          description: Corso non trovato
+        '409':
+          description: Il corso ha assegnazioni collegate e non può essere eliminato
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /corsi/{id}/disattiva:
+    put:
+      tags: [Corsi]
+      summary: Disattiva un corso (solo referente)
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Corso disattivato
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Corso'
+        '403':
+          description: Operazione non consentita per il ruolo
+        '404':
+          description: Corso non trovato
+
+  /assegnazioni:
+    get:
+      tags: [Assegnazioni]
+      summary: Elenco delle assegnazioni con filtri
+      description: >
+        Un dipendente riceve solo le proprie assegnazioni; il referente le vede tutte.
+      parameters:
+        - in: query
+          name: stato
+          schema:
+            $ref: '#/components/schemas/StatoAssegnazione'
+        - in: query
+          name: categoria
+          schema:
+            type: string
+          description: Id della categoria
+        - in: query
+          name: corso
+          schema:
+            type: string
+          description: Id del corso
+        - in: query
+          name: dipendente
+          schema:
+            type: string
+          description: Id del dipendente (solo referente)
+      responses:
+        '200':
+          description: Elenco assegnazioni
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Assegnazione'
+    post:
+      tags: [Assegnazioni]
+      summary: Crea un'assegnazione (solo referente)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssegnazioneInput'
+      responses:
+        '201':
+          description: Assegnazione creata
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Assegnazione'
+        '400':
+          description: Dati non validi (es. corso non attivo, date incoerenti)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Operazione non consentita per il ruolo
+
+  /assegnazioni/{id}:
+    get:
+      tags: [Assegnazioni]
+      summary: Dettaglio di un'assegnazione
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Assegnazione
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Assegnazione'
+        '404':
+          description: Assegnazione non trovata
+    put:
+      tags: [Assegnazioni]
+      summary: Modifica un'assegnazione (solo referente)
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                corso:
+                  type: string
+                dipendente:
+                  type: string
+                dataScadenza:
+                  type: string
+                  format: date-time
+      responses:
+        '200':
+          description: Assegnazione aggiornata
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Assegnazione'
+        '400':
+          description: Dati non validi
+        '403':
+          description: Operazione non consentita per il ruolo
+        '404':
+          description: Assegnazione non trovata
+    delete:
+      tags: [Assegnazioni]
+      summary: Elimina un'assegnazione (solo referente)
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '204':
+          description: Assegnazione eliminata
+        '403':
+          description: Operazione non consentita per il ruolo
+        '404':
+          description: Assegnazione non trovata
+
+  /assegnazioni/{id}/completa:
+    put:
+      tags: [Assegnazioni]
+      summary: Segna un'assegnazione come completata
+      description: Consentito al dipendente proprietario o al referente.
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Assegnazione completata
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Assegnazione'
+        '404':
+          description: Assegnazione non trovata
+        '409':
+          description: Transizione di stato non consentita
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /assegnazioni/{id}/annulla:
+    put:
+      tags: [Assegnazioni]
+      summary: Annulla un'assegnazione (solo referente)
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Assegnazione annullata
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Assegnazione'
+        '403':
+          description: Operazione non consentita per il ruolo
+        '404':
+          description: Assegnazione non trovata
+        '409':
+          description: Transizione di stato non consentita
+
+  /statistiche/academy:
+    get:
+      tags: [Statistiche]
+      summary: Riepilogo per mese e categoria (solo referente)
+      parameters:
+        - in: query
+          name: mese
+          schema:
+            type: string
+            example: '2026-05'
+          description: Mese in formato YYYY-MM
+        - in: query
+          name: categoria
+          schema:
+            type: string
+          description: Nome della categoria
+        - in: query
+          name: dipendente
+          schema:
+            type: string
+          description: Id del dipendente
+      responses:
+        '200':
+          description: Righe di riepilogo
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Statistica'
+        '403':
+          description: Operazione non consentita per il ruolo
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    IdParam:
+      in: path
+      name: id
+      required: true
+      schema:
+        type: string
+      description: Identificativo della risorsa
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+
+    RegisterRequest:
+      type: object
+      required: [firstName, lastName, username, password]
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        username:
+          type: string
+          format: email
+        password:
+          type: string
+          description: Password forte (maiuscola, minuscola, numero, simbolo, min 8)
+        picture:
+          type: string
+
+    LoginRequest:
+      type: object
+      required: [username, password]
+      properties:
+        username:
+          type: string
+          format: email
+        password:
+          type: string
+
+    LoginResponse:
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/User'
+        token:
+          type: string
+        refreshToken:
+          type: string
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        fullName:
+          type: string
+        email:
+          type: string
+        ruolo:
+          type: string
+          enum: [DIPENDENTE, REFERENTE]
+        picture:
+          type: string
+
+    Categoria:
+      type: object
+      properties:
+        id:
+          type: string
+        nomeCategoria:
+          type: string
+
+    CorsoInput:
+      type: object
+      required: [titolo, categoria, durataOre]
+      properties:
+        titolo:
+          type: string
+        descrizione:
+          type: string
+        categoria:
+          type: string
+          description: Id della categoria
+        durataOre:
+          type: integer
+          minimum: 1
+        obbligatorio:
+          type: boolean
+        attivo:
+          type: boolean
+
+    Corso:
+      type: object
+      properties:
+        id:
+          type: string
+        titolo:
+          type: string
+        descrizione:
+          type: string
+        categoria:
+          $ref: '#/components/schemas/Categoria'
+        durataOre:
+          type: integer
+        obbligatorio:
+          type: boolean
+        attivo:
+          type: boolean
+
+    StatoAssegnazione:
+      type: string
+      enum: [Assegnato, Completato, Scaduto, Annullato]
+
+    AssegnazioneInput:
+      type: object
+      required: [corso, dipendente, dataScadenza]
+      properties:
+        corso:
+          type: string
+          description: Id del corso
+        dipendente:
+          type: string
+          description: Id del dipendente
+        dataAssegnazione:
+          type: string
+          format: date-time
+        dataScadenza:
+          type: string
+          format: date-time
+
+    Assegnazione:
+      type: object
+      properties:
+        id:
+          type: string
+        corso:
+          $ref: '#/components/schemas/Corso'
+        dipendente:
+          $ref: '#/components/schemas/User'
+        dataAssegnazione:
+          type: string
+          format: date-time
+        dataScadenza:
+          type: string
+          format: date-time
+        stato:
+          $ref: '#/components/schemas/StatoAssegnazione'
+        dataCompletamento:
+          type: string
+          format: date-time
+
+    Statistica:
+      type: object
+      properties:
+        mese:
+          type: string
+          example: '2026-05'
+        categoria:
+          type: string
+          example: Sicurezza
+        numeroAssegnazioni:
+          type: integer
+        numeroCompletamenti:
+          type: integer
+        percentualeCompletamento:
+          type: number
+          format: float
+          example: 66.67
