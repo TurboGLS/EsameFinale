@@ -3,7 +3,7 @@ import { Corso } from './corso.entity';
 
 const corsoSchema = new Schema<Corso>({
     titolo: { type: String, required: true },
-    descrizione: { type: String },
+    descrizione: { type: String, default: '' },
     categoria: { type: Schema.Types.ObjectId, ref: 'Categoria', required: true },
     durataOre: { type: Number, required: true, min: 1 },
     obbligatorio: { type: Boolean, default: false },
