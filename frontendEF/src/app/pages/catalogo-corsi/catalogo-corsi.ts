@@ -7,7 +7,6 @@ import { CategoriaService } from '../../services/categoria.service';
 import { ToastService } from '../../services/toast.service';
 import { ConfirmService } from '../../services/confirm.service';
 
-// smart: gestione del catalogo corsi (solo referente).
 @Component({
   selector: 'app-catalogo-corsi',
   standalone: false,
@@ -20,7 +19,6 @@ export class CatalogoCorsiComponent implements OnInit {
   protected confirmSrv = inject(ConfirmService);
   protected modalSrv = inject(NgbModal);
 
-  // template del modale con il form
   @ViewChild('formModal') formModal!: TemplateRef<unknown>;
   private modalRef?: NgbModalRef;
 
@@ -29,11 +27,11 @@ export class CatalogoCorsiComponent implements OnInit {
 
   // filtri
   filtroCategoria = '';
-  filtroAttivo = ''; // '' | 'true' | 'false'
+  filtroAttivo = '';
 
   loading = false;
 
-  // corso in fase di modifica (null in creazione)
+  // corso in fase di modifica, null in creazione
   corsoInModifica: Corso | null = null;
   salvataggioInCorso = false;
 

@@ -11,7 +11,7 @@ export class UserService {
     protected http = inject(HttpClient);
     protected baseUrl = `${environment.apiUrl}/users`;
 
-    // elenco dei dipendenti (usato dal referente per assegnare i corsi)
+    // elenco dei dipendenti
     getDipendenti(): Observable<User[]> {
         return this.http.get<User[]>(`${this.baseUrl}/dipendenti`);
     }

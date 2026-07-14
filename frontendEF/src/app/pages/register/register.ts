@@ -24,9 +24,7 @@ export class RegisterComponent implements OnInit, OnDestroy{
     firstName: new FormControl<string | null>(''),
     lastName: new FormControl<string | null>(''),
     picture: ['', Validators.required],
-    // username deve essere una email (come richiesto dal backend)
     username: ['', [Validators.required, Validators.email]],
-    // password forte: min 8 caratteri con maiuscola, minuscola, numero e simbolo
     password: ['', [
       Validators.required,
       Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/)
@@ -78,8 +76,7 @@ export class RegisterComponent implements OnInit, OnDestroy{
       )
       .subscribe(() => {
         this.toastSrv.success('Registrazione avvenuta con successo. Ora puoi accedere.', 'Account creato');
-        // Dopo la registrazione l'utente non è ancora autenticato:
-        // lo mando al login (inoltrando la requestedURL se presente).
+        // Dopo la registrazione l'utente non è ancora autenticato quindi lo mando al login (inoltrando la requestedURL se presente)
         this.router.navigate(['/login'], {
           queryParams: this.requestedURL ? { requestedUrl: this.requestedURL } : {}
         });

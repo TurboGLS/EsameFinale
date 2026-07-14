@@ -67,8 +67,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.authSrv.login(username!, password!)
       .pipe(
         catchError(response => {
-          // 401 = credenziali non valide: messaggio sempre generico.
-          // Altri status (es. 500) mostrano un errore generico di servizio.
+          // 401 credenziali non valide
           const message = response.status === 401
             ? 'Credenziali errate'
             : 'Impossibile effettuare l\'accesso. Riprova più tardi.';

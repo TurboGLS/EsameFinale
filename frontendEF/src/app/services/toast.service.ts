@@ -2,12 +2,6 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { Toast, ToastType } from '../entities/toast.entity';
 
-/**
- * Smart service: conosce la logica delle notifiche.
- * Mantiene lo stato dei toast e sa crearli, rimuoverli e farli
- * scomparire automaticamente. I componenti (dumb) si limitano a
- * presentarli leggendo `toasts$`.
- */
 @Injectable({
   providedIn: 'root'
 })

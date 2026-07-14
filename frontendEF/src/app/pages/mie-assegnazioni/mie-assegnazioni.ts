@@ -7,8 +7,6 @@ import { CategoriaService } from '../../services/categoria.service';
 import { ToastService } from '../../services/toast.service';
 import { ConfirmService } from '../../services/confirm.service';
 
-// smart: area dipendente. Carica le assegnazioni proprie (il backend le
-// restringe già all'utente), gestisce i filtri e il completamento.
 @Component({
   selector: 'app-mie-assegnazioni',
   standalone: false,
@@ -24,8 +22,7 @@ export class MieAssegnazioniComponent implements OnInit {
   categorie: Categoria[] = [];
   readonly stati = STATI_ASSEGNAZIONE;
 
-  // stato dei filtri (stato e categoria sono applicati lato server;
-  // la scadenza è applicata lato client sulla lista già caricata)
+  // stato dei filtri
   filtroStato: StatoAssegnazione | '' = '';
   filtroCategoria = '';
   filtroScadenza: NgbDateStruct | null = null;
@@ -51,13 +48,13 @@ export class MieAssegnazioniComponent implements OnInit {
     });
   }
 
-  // assegnazioni effettivamente mostrate: applica il filtro "scadenza entro il"
+  // applica il filtro sulla scadenza
   get assegnazioniVisibili(): Assegnazione[] {
     if (!this.filtroScadenza) {
       return this.assegnazioni;
     }
     const { year, month, day } = this.filtroScadenza;
-    // limite = fine della giornata selezionata
+    // limite fino alla fine della giornata selezionata
     const limite = new Date(year, month - 1, day, 23, 59, 59).getTime();
     return this.assegnazioni.filter(a => new Date(a.dataScadenza).getTime() <= limite);
   }

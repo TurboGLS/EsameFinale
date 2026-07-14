@@ -3,8 +3,6 @@ import { FormBuilder, Validators } from '@angular/forms';
 import { Categoria } from '../../entities/categoria.entity';
 import { Corso, CorsoPayload } from '../../entities/corso.entity';
 
-// dumb: form di creazione/modifica corso. Riceve i dati in input,
-// valida a livello di presentazione ed emette il payload al salvataggio.
 @Component({
   selector: 'app-corso-form',
   standalone: false,
@@ -13,7 +11,7 @@ import { Corso, CorsoPayload } from '../../entities/corso.entity';
 export class CorsoFormComponent implements OnChanges {
   protected fb = inject(FormBuilder);
 
-  // corso da modificare; null in creazione
+  // corso da modificare, null in creazione
   @Input() corso: Corso | null = null;
   @Input() categorie: Categoria[] = [];
   @Input() salvataggioInCorso = false;

@@ -12,7 +12,7 @@ export const logoutInterceptor: HttpInterceptorFn = (req, next) => {
   const http = inject(HttpClient);
   const router = inject(Router);
 
-  // Entra in gioco sulla risposta delle API
+  // entra in gioco sulla risposta delle API
   const excludedRequests = [`${environment.apiUrl}/login`, `${environment.apiUrl}/refresh`];
   if (excludedRequests.includes(req.url)) {
     return next(req);
@@ -28,7 +28,7 @@ export const logoutInterceptor: HttpInterceptorFn = (req, next) => {
               return http.request(req.clone());
             }),
             catchError(_ => {
-              // il refresh è fallito: sessione scaduta, riporto al login
+              // il refresh è fallito, quindi riporto al login
               toastSrv.error('La sessione è scaduta, effettua di nuovo l\'accesso.', 'Sessione scaduta');
               authSrv.logout();
               router.navigate(['/login']);

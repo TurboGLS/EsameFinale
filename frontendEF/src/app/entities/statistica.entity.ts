@@ -1,4 +1,3 @@
-// riga del riepilogo statistiche (aggregata per mese e categoria)
 export type Statistica = {
     mese: string;
     categoria: string;

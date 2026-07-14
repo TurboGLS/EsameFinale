@@ -5,9 +5,6 @@ import { AuthService } from '../services/auth.service';
 import { ToastService } from '../services/toast.service';
 import { Ruolo } from '../entities/user.entity';
 
-// Guard con factory: verifica che l'utente autenticato abbia uno dei ruoli consentiti.
-// Va usato sempre dopo authGuard (che garantisce l'autenticazione).
-// Esempio d'uso nelle route: canActivate: [authGuard, roleGuard('REFERENTE')]
 export const roleGuard = (...ruoli: Ruolo[]): CanActivateFn => {
   return () => {
     const authSrv = inject(AuthService);
@@ -20,7 +17,7 @@ export const roleGuard = (...ruoli: Ruolo[]): CanActivateFn => {
         if (user && ruoli.includes(user.ruolo)) {
           return true;
         }
-        // ruolo non abilitato: avviso e reindirizzo alla dashboard
+        // con ruolo non abilitato quindi avviso e reindirizzo alla dashboard
         toastSrv.error('Non hai i permessi per accedere a questa sezione.', 'Accesso negato');
         return router.createUrlTree(['/dashboard']);
       })

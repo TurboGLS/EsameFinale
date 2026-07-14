@@ -1,12 +1,11 @@
 import { Corso } from './corso.entity';
 import { User } from './user.entity';
 
-// stati possibili di una assegnazione
 export type StatoAssegnazione = 'Assegnato' | 'Completato' | 'Scaduto' | 'Annullato';
 
 export const STATI_ASSEGNAZIONE: StatoAssegnazione[] = ['Assegnato', 'Completato', 'Scaduto', 'Annullato'];
 
-// assegnazione restituita dall'API (corso e dipendente popolati)
+// assegnazione restituita
 export type Assegnazione = {
     id: string;
     corso: Corso;
@@ -17,7 +16,7 @@ export type Assegnazione = {
     dataCompletamento?: string;
 }
 
-// dati inviati all'API in creazione/modifica (corso e dipendente come id)
+// dati inviati in creazione o modifica
 export type AssegnazionePayload = {
     corso: string;
     dipendente: string;

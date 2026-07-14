@@ -11,7 +11,6 @@ import { UserService } from '../../services/user.service';
 import { ToastService } from '../../services/toast.service';
 import { ConfirmService } from '../../services/confirm.service';
 
-// smart: gestione di tutte le assegnazioni (solo referente).
 @Component({
   selector: 'app-assegnazioni',
   standalone: false,
@@ -26,7 +25,6 @@ export class AssegnazioniComponent implements OnInit {
   protected confirmSrv = inject(ConfirmService);
   protected modalSrv = inject(NgbModal);
 
-  // template del modale con il form
   @ViewChild('formModal') formModal!: TemplateRef<unknown>;
   private modalRef?: NgbModalRef;
 
@@ -44,12 +42,12 @@ export class AssegnazioniComponent implements OnInit {
 
   loading = false;
 
-  // assegnazione in fase di modifica (null in creazione)
+  // assegnazione in fase di modifica, null in creazione
   assegnazioneInModifica: Assegnazione | null = null;
   salvataggioInCorso = false;
 
   ngOnInit(): void {
-    // dati di supporto per filtri e form
+    // passo i dati per filtri e form
     this.corsoSrv.getAll({ attivo: true }).subscribe(corsi => this.corsiAttivi = corsi);
     this.categoriaSrv.getAll().subscribe(categorie => this.categorie = categorie);
     this.userSrv.getDipendenti().subscribe(dipendenti => this.dipendenti = dipendenti);

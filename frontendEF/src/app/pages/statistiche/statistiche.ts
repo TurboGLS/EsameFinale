@@ -22,7 +22,7 @@ export class StatisticheComponent implements OnInit {
   dipendenti: User[] = [];
 
   // filtri
-  filtroMese = '';       // formato YYYY-MM
+  filtroMese = '';
   filtroCategoria = '';
   filtroDipendente = '';
 

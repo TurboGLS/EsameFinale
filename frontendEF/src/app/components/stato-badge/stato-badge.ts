@@ -1,7 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { StatoAssegnazione } from '../../entities/assegnazione.entity';
 
-// dumb: mostra lo stato di una assegnazione come badge colorato
 @Component({
   selector: 'app-stato-badge',
   standalone: false,
@@ -16,7 +15,7 @@ export class StatoBadgeComponent {
       case 'Completato': return 'bg-success';
       case 'Scaduto': return 'bg-danger';
       case 'Annullato': return 'bg-secondary';
-      default: return 'bg-primary'; // Assegnato
+      default: return 'bg-primary'; // passo Assegnato come default
     }
   }
 }

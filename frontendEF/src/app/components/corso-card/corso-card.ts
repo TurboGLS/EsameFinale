@@ -1,7 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Corso } from '../../entities/corso.entity';
 
-// dumb: presenta un corso del catalogo ed emette gli eventi di gestione
 @Component({
   selector: 'app-corso-card',
   standalone: false,

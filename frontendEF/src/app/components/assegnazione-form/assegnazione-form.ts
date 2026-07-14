@@ -4,7 +4,6 @@ import { Corso } from '../../entities/corso.entity';
 import { User } from '../../entities/user.entity';
 import { Assegnazione, AssegnazionePayload } from '../../entities/assegnazione.entity';
 
-// dumb: form di creazione/modifica assegnazione
 @Component({
   selector: 'app-assegnazione-form',
   standalone: false,
@@ -14,7 +13,7 @@ export class AssegnazioneFormComponent implements OnChanges {
   protected fb = inject(FormBuilder);
 
   @Input() assegnazione: Assegnazione | null = null;
-  @Input() corsi: Corso[] = [];         // solo corsi attivi (filtrati dallo smart)
+  @Input() corsi: Corso[] = [];
   @Input() dipendenti: User[] = [];
   @Input() salvataggioInCorso = false;
 
