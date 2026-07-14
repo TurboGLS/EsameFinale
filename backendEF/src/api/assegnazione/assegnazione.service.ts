@@ -54,14 +54,18 @@ export class AssegnazioneService {
             query.dipendente = filters.dipendente;
         }
 
-        if (filters.corso) {
-            query.corso = filters.corso;
-        }
-
-        // filtro per categoria
+        // filtro per corso e/o categoria
         if (filters.categoria) {
             const corsi = await CorsoModel.find({ categoria: filters.categoria }).select('_id');
-            query.corso = { $in: corsi.map(c => c._id) };
+            const idsCategoria = corsi.map(c => String(c._id));
+            if (filters.corso) {
+                // il corso specifico deve anche appartenere alla categoria selezionata
+                query.corso = idsCategoria.includes(filters.corso) ? filters.corso : { $in: [] };
+            } else {
+                query.corso = { $in: idsCategoria };
+            }
+        } else if (filters.corso) {
+            query.corso = filters.corso;
         }
 
         const docs = await AssegnazioneModel.find(query)
