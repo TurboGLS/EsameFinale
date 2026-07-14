@@ -1,0 +1,9 @@
+.assegnazione-card {
+  border: 1px solid #ececef;
+  border-radius: 0.75rem;
+}
+
+.assegnazione-card .card-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+}

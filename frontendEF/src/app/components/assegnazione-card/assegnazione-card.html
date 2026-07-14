@@ -1,0 +1,44 @@
+<div class="card h-100 shadow-sm assegnazione-card">
+  <div class="card-body d-flex flex-column">
+    <div class="d-flex justify-content-between align-items-start mb-2">
+      <h5 class="card-title mb-0">{{ assegnazione.corso.titolo }}</h5>
+      <app-stato-badge [stato]="assegnazione.stato"></app-stato-badge>
+    </div>
+
+    <span class="badge rounded-pill text-bg-light border mb-2 align-self-start">
+      {{ assegnazione.corso.categoria.nomeCategoria }}
+    </span>
+
+    <p class="text-muted small mb-2" *ngIf="assegnazione.corso.descrizione">
+      {{ assegnazione.corso.descrizione }}
+    </p>
+
+    <ul class="list-unstyled small mb-3">
+      <li *ngIf="mostraDipendente">
+        <strong>Dipendente:</strong> {{ assegnazione.dipendente.fullName }}
+      </li>
+      <li><strong>Durata:</strong> {{ assegnazione.corso.durataOre }} ore</li>
+      <li><strong>Assegnato il:</strong> {{ assegnazione.dataAssegnazione | date:'dd/MM/yyyy' }}</li>
+      <li><strong>Scadenza:</strong> {{ assegnazione.dataScadenza | date:'dd/MM/yyyy' }}</li>
+      <li *ngIf="assegnazione.dataCompletamento">
+        <strong>Completato il:</strong> {{ assegnazione.dataCompletamento | date:'dd/MM/yyyy' }}
+      </li>
+    </ul>
+
+    <div class="mt-auto d-flex gap-2 flex-wrap">
+      <button *ngIf="puoCompletare && completabile" type="button" class="btn btn-success btn-sm"
+        (click)="completa.emit(assegnazione)">
+        Segna come completato
+      </button>
+
+      <button *ngIf="puoGestire" type="button" class="btn btn-outline-primary btn-sm"
+        (click)="modifica.emit(assegnazione)">
+        Modifica
+      </button>
+      <button *ngIf="puoGestire && assegnazione.stato !== 'Annullato' && assegnazione.stato !== 'Completato'"
+        type="button" class="btn btn-outline-danger btn-sm" (click)="annulla.emit(assegnazione)">
+        Annulla
+      </button>
+    </div>
+  </div>
+</div>

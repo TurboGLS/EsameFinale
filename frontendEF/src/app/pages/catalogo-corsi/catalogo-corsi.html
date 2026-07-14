@@ -1,0 +1,61 @@
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">Catalogo corsi</h2>
+    <button class="btn btn-primary" (click)="apriCreazione()">Nuovo corso</button>
+  </div>
+
+  <!-- Filtri -->
+  <div class="card shadow-sm mb-4">
+    <div class="card-body">
+      <div class="row g-3 align-items-end">
+        <div class="col-md-4">
+          <label class="form-label">Categoria</label>
+          <select class="form-select" [(ngModel)]="filtroCategoria" (change)="carica()">
+            <option value="">Tutte</option>
+            <option *ngFor="let c of categorie" [value]="c.id">{{ c.nomeCategoria }}</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Stato</label>
+          <select class="form-select" [(ngModel)]="filtroAttivo" (change)="carica()">
+            <option value="">Tutti</option>
+            <option value="true">Attivi</option>
+            <option value="false">Non attivi</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <button class="btn btn-outline-secondary" (click)="azzeraFiltri()">Azzera filtri</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status"></div>
+  </div>
+
+  <div *ngIf="!loading && corsi.length === 0" class="alert alert-light border text-center">
+    Nessun corso trovato con i filtri selezionati.
+  </div>
+
+  <div class="row g-3" *ngIf="!loading">
+    <div class="col-md-6 col-lg-4" *ngFor="let corso of corsi">
+      <app-corso-card [corso]="corso" (modifica)="apriModifica($event)" (disattiva)="disattiva($event)"
+        (elimina)="elimina($event)">
+      </app-corso-card>
+    </div>
+  </div>
+</div>
+
+<!-- Modale creazione/modifica corso -->
+<ng-template #formModal>
+  <div class="modal-header">
+    <h5 class="modal-title">{{ corsoInModifica ? 'Modifica corso' : 'Nuovo corso' }}</h5>
+    <button type="button" class="btn-close" aria-label="Chiudi" (click)="chiudiForm()"></button>
+  </div>
+  <div class="modal-body">
+    <app-corso-form [corso]="corsoInModifica" [categorie]="categorie" [salvataggioInCorso]="salvataggioInCorso"
+      (salva)="salva($event)" (annulla)="chiudiForm()">
+    </app-corso-form>
+  </div>
+</ng-template>

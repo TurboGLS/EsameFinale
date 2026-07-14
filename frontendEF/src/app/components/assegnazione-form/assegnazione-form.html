@@ -1,0 +1,45 @@
+<form [formGroup]="assegnazioneForm" (ngSubmit)="onSubmit()">
+  <div class="mb-3">
+    <label class="form-label">Corso</label>
+    <select class="form-select" formControlName="corso">
+      <option value="">Seleziona un corso</option>
+      <option *ngFor="let c of corsi" [value]="c.id">
+        {{ c.titolo }} ({{ c.categoria.nomeCategoria }})
+      </option>
+    </select>
+    <div class="text-danger small mt-1"
+      *ngIf="assegnazioneForm.get('corso')?.touched && assegnazioneForm.get('corso')?.invalid">
+      Seleziona un corso.
+    </div>
+    <div class="form-text" *ngIf="!isModifica">Sono selezionabili solo i corsi attivi.</div>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Dipendente</label>
+    <select class="form-select" formControlName="dipendente">
+      <option value="">Seleziona un dipendente</option>
+      <option *ngFor="let d of dipendenti" [value]="d.id">{{ d.fullName }}</option>
+    </select>
+    <div class="text-danger small mt-1"
+      *ngIf="assegnazioneForm.get('dipendente')?.touched && assegnazioneForm.get('dipendente')?.invalid">
+      Seleziona un dipendente.
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Data di scadenza</label>
+    <input type="date" class="form-control" formControlName="dataScadenza" />
+    <div class="text-danger small mt-1"
+      *ngIf="assegnazioneForm.get('dataScadenza')?.touched && assegnazioneForm.get('dataScadenza')?.invalid">
+      La data di scadenza è obbligatoria.
+    </div>
+  </div>
+
+  <div class="d-flex gap-2 mt-4">
+    <button type="submit" class="btn btn-primary" [disabled]="salvataggioInCorso">
+      <span *ngIf="salvataggioInCorso" class="spinner-border spinner-border-sm me-2"></span>
+      Salva
+    </button>
+    <button type="button" class="btn btn-outline-secondary" (click)="annulla.emit()">Annulla</button>
+  </div>
+</form>

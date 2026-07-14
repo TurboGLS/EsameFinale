@@ -1,0 +1,13 @@
+<div class="modal-header">
+  <h5 class="modal-title">{{ titolo }}</h5>
+  <button type="button" class="btn-close" aria-label="Chiudi" (click)="activeModal.dismiss()"></button>
+</div>
+<div class="modal-body">
+  {{ messaggio }}
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-outline-secondary" (click)="activeModal.dismiss()">Annulla</button>
+  <button type="button" class="btn" [ngClass]="confermaClass" (click)="activeModal.close(true)">
+    {{ confermaLabel }}
+  </button>
+</div>

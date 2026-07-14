@@ -1,0 +1,74 @@
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">Assegnazioni</h2>
+    <button class="btn btn-primary" (click)="apriCreazione()">Nuova assegnazione</button>
+  </div>
+
+  <!-- Filtri -->
+  <div class="card shadow-sm mb-4">
+    <div class="card-body">
+      <div class="row g-3 align-items-end">
+        <div class="col-md-3">
+          <label class="form-label">Stato</label>
+          <select class="form-select" [(ngModel)]="filtroStato" (change)="carica()">
+            <option value="">Tutti</option>
+            <option *ngFor="let s of stati" [value]="s">{{ s }}</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Categoria</label>
+          <select class="form-select" [(ngModel)]="filtroCategoria" (change)="carica()">
+            <option value="">Tutte</option>
+            <option *ngFor="let c of categorie" [value]="c.id">{{ c.nomeCategoria }}</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Corso</label>
+          <select class="form-select" [(ngModel)]="filtroCorso" (change)="carica()">
+            <option value="">Tutti</option>
+            <option *ngFor="let c of corsiAttivi" [value]="c.id">{{ c.titolo }}</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Dipendente</label>
+          <select class="form-select" [(ngModel)]="filtroDipendente" (change)="carica()">
+            <option value="">Tutti</option>
+            <option *ngFor="let d of dipendenti" [value]="d.id">{{ d.fullName }}</option>
+          </select>
+        </div>
+        <div class="col-12">
+          <button class="btn btn-outline-secondary" (click)="azzeraFiltri()">Azzera filtri</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status"></div>
+  </div>
+
+  <div *ngIf="!loading && assegnazioni.length === 0" class="alert alert-light border text-center">
+    Nessuna assegnazione trovata con i filtri selezionati.
+  </div>
+
+  <div class="row g-3" *ngIf="!loading">
+    <div class="col-md-6 col-lg-4" *ngFor="let a of assegnazioni">
+      <app-assegnazione-card [assegnazione]="a" [mostraDipendente]="true" [puoGestire]="true"
+        (modifica)="apriModifica($event)" (annulla)="annulla($event)">
+      </app-assegnazione-card>
+    </div>
+  </div>
+</div>
+
+<!-- Modale creazione/modifica assegnazione -->
+<ng-template #formModal>
+  <div class="modal-header">
+    <h5 class="modal-title">{{ assegnazioneInModifica ? 'Modifica assegnazione' : 'Nuova assegnazione' }}</h5>
+    <button type="button" class="btn-close" aria-label="Chiudi" (click)="chiudiForm()"></button>
+  </div>
+  <div class="modal-body">
+    <app-assegnazione-form [assegnazione]="assegnazioneInModifica" [corsi]="corsiAttivi" [dipendenti]="dipendenti"
+      [salvataggioInCorso]="salvataggioInCorso" (salva)="salva($event)" (annulla)="chiudiForm()">
+    </app-assegnazione-form>
+  </div>
+</ng-template>

@@ -1,11 +1,30 @@
 <nav class="navbar bg-primary navbar-expand mb-3" data-bs-theme="dark">
   <div class="container-fluid">
-    <a class="nabar-brand" [routerLink]="['/products']">ITS-CLASSROOM</a>
-    <div class="collapse navbar-collapse">
+    <a class="navbar-brand" [routerLink]="['/dashboard']">ACADEMY</a>
+
+    <div class="collapse navbar-collapse" *ngIf="(currentUser$ | async) as currentUser">
       <ul class="navbar-nav">
         <li class="nav-item">
-          <a class="nav-link" [routerLink]="['/products']" routerLinkActive="active">Classroom</a>
-        </li>>
+          <a class="nav-link" [routerLink]="['/dashboard']" routerLinkActive="active">Dashboard</a>
+        </li>
+
+        <!-- Menu dipendente -->
+        <li class="nav-item" *ngIf="currentUser.ruolo === 'DIPENDENTE'">
+          <a class="nav-link" [routerLink]="['/mie-assegnazioni']" routerLinkActive="active">I miei corsi</a>
+        </li>
+
+        <!-- Menu referente Academy -->
+        <ng-container *ngIf="currentUser.ruolo === 'REFERENTE'">
+          <li class="nav-item">
+            <a class="nav-link" [routerLink]="['/corsi']" routerLinkActive="active">Catalogo corsi</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" [routerLink]="['/assegnazioni']" routerLinkActive="active">Assegnazioni</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" [routerLink]="['/statistiche']" routerLinkActive="active">Statistiche</a>
+          </li>
+        </ng-container>
       </ul>
     </div>
 

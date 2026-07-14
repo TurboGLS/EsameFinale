@@ -1,0 +1,72 @@
+<div class="container py-4">
+  <h2 class="mb-3">Statistiche formazione</h2>
+
+  <!-- Filtri -->
+  <div class="card shadow-sm mb-4">
+    <div class="card-body">
+      <div class="row g-3 align-items-end">
+        <div class="col-md-3">
+          <label class="form-label">Mese</label>
+          <input type="month" class="form-control" [(ngModel)]="filtroMese" (change)="carica()" />
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Categoria</label>
+          <select class="form-select" [(ngModel)]="filtroCategoria" (change)="carica()">
+            <option value="">Tutte</option>
+            <option *ngFor="let c of categorie" [value]="c.id">{{ c.nomeCategoria }}</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Dipendente</label>
+          <select class="form-select" [(ngModel)]="filtroDipendente" (change)="carica()">
+            <option value="">Tutti</option>
+            <option *ngFor="let d of dipendenti" [value]="d.id">{{ d.fullName }}</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <button class="btn btn-outline-secondary" (click)="azzeraFiltri()">Azzera filtri</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status"></div>
+  </div>
+
+  <div *ngIf="!loading && statistiche.length === 0" class="alert alert-light border text-center">
+    Nessun dato disponibile con i filtri selezionati.
+  </div>
+
+  <div class="card shadow-sm" *ngIf="!loading && statistiche.length > 0">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Mese</th>
+            <th>Categoria</th>
+            <th class="text-center">Assegnati</th>
+            <th class="text-center">Completati</th>
+            <th style="min-width: 180px;">Completamento</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let s of statistiche">
+            <td>{{ s.mese }}</td>
+            <td>{{ s.categoria }}</td>
+            <td class="text-center">{{ s.numeroAssegnazioni }}</td>
+            <td class="text-center">{{ s.numeroCompletamenti }}</td>
+            <td>
+              <div class="d-flex align-items-center gap-2">
+                <div class="progress flex-grow-1" style="height: 8px;">
+                  <div class="progress-bar bg-success" [style.width.%]="s.percentualeCompletamento"></div>
+                </div>
+                <span class="small text-muted">{{ s.percentualeCompletamento }}%</span>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

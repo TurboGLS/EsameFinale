@@ -1,0 +1,53 @@
+<div class="container py-4" *ngIf="currentUser$ | async as user">
+  <div class="mb-4">
+    <h2 class="mb-1">Ciao, {{ user.firstName }}</h2>
+    <p class="text-muted mb-0">
+      Sei collegato come
+      <strong>{{ user.ruolo === 'REFERENTE' ? 'Referente Academy' : 'Dipendente' }}</strong>.
+    </p>
+  </div>
+
+  <div class="row g-3">
+    <!-- Funzionalità DIPENDENTE -->
+    <ng-container *ngIf="user.ruolo === 'DIPENDENTE'">
+      <div class="col-md-6 col-lg-4">
+        <a class="card h-100 text-decoration-none shadow-sm dash-card" [routerLink]="['/mie-assegnazioni']">
+          <div class="card-body">
+            <h5 class="card-title">I miei corsi</h5>
+            <p class="card-text text-muted small mb-0">
+              Consulta i corsi assegnati, le scadenze e segna i completamenti.
+            </p>
+          </div>
+        </a>
+      </div>
+    </ng-container>
+
+    <!-- Funzionalità REFERENTE ACADEMY -->
+    <ng-container *ngIf="user.ruolo === 'REFERENTE'">
+      <div class="col-md-6 col-lg-4">
+        <a class="card h-100 text-decoration-none shadow-sm dash-card" [routerLink]="['/corsi']">
+          <div class="card-body">
+            <h5 class="card-title">Catalogo corsi</h5>
+            <p class="card-text text-muted small mb-0">Crea, modifica, disattiva ed elimina i corsi.</p>
+          </div>
+        </a>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <a class="card h-100 text-decoration-none shadow-sm dash-card" [routerLink]="['/assegnazioni']">
+          <div class="card-body">
+            <h5 class="card-title">Assegnazioni</h5>
+            <p class="card-text text-muted small mb-0">Assegna i corsi ai dipendenti e gestisci le assegnazioni.</p>
+          </div>
+        </a>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <a class="card h-100 text-decoration-none shadow-sm dash-card" [routerLink]="['/statistiche']">
+          <div class="card-body">
+            <h5 class="card-title">Statistiche</h5>
+            <p class="card-text text-muted small mb-0">Riepilogo dei completamenti per mese e categoria.</p>
+          </div>
+        </a>
+      </div>
+    </ng-container>
+  </div>
+</div>

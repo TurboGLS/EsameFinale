@@ -1,0 +1,60 @@
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">I miei corsi</h2>
+  </div>
+
+  <!-- Filtri -->
+  <div class="card shadow-sm mb-4">
+    <div class="card-body">
+      <div class="row g-3 align-items-end">
+        <div class="col-md-3">
+          <label class="form-label">Stato</label>
+          <select class="form-select" [(ngModel)]="filtroStato" (change)="carica()">
+            <option value="">Tutti</option>
+            <option *ngFor="let s of stati" [value]="s">{{ s }}</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Categoria</label>
+          <select class="form-select" [(ngModel)]="filtroCategoria" (change)="carica()">
+            <option value="">Tutte</option>
+            <option *ngFor="let c of categorie" [value]="c.id">{{ c.nomeCategoria }}</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Scadenza entro il</label>
+          <div class="input-group">
+            <input class="form-control" placeholder="aaaa-mm-gg" name="scadenza"
+              [(ngModel)]="filtroScadenza" ngbDatepicker #d="ngbDatepicker" readonly />
+            <button class="btn btn-outline-secondary" type="button" (click)="d.toggle()" aria-label="Apri calendario">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5M1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4z" />
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <button class="btn btn-outline-secondary" (click)="azzeraFiltri()">Azzera filtri</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Caricamento -->
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status"></div>
+  </div>
+
+  <!-- Stato vuoto -->
+  <div *ngIf="!loading && assegnazioniVisibili.length === 0" class="alert alert-light border text-center">
+    Nessun corso assegnato con i filtri selezionati.
+  </div>
+
+  <!-- Elenco assegnazioni -->
+  <div class="row g-3" *ngIf="!loading">
+    <div class="col-md-6 col-lg-4" *ngFor="let a of assegnazioniVisibili">
+      <app-assegnazione-card [assegnazione]="a" [puoCompletare]="true" (completa)="completa($event)">
+      </app-assegnazione-card>
+    </div>
+  </div>
+</div>
