@@ -25,11 +25,20 @@
       <div class="mb-3">
         <label class="form-label">Picture URL</label>
         <input type="text" class="form-control" formControlName="picture" placeholder="https://..." />
+        <div class="text-danger small mt-1"
+          *ngIf="registerFrom.get('picture')?.touched && registerFrom.get('picture')?.invalid">
+          L'URL dell'immagine è obbligatorio.
+        </div>
       </div>
 
       <div class="mb-3">
         <label class="form-label">Username</label>
         <input type="text" class="form-control" formControlName="username" placeholder="nome@esempio.com" autocomplete="username" />
+        <div class="text-danger small mt-1"
+          *ngIf="registerFrom.get('username')?.touched && registerFrom.get('username')?.invalid">
+          <span *ngIf="registerFrom.get('username')?.errors?.['required']">L'email è obbligatoria.</span>
+          <span *ngIf="registerFrom.get('username')?.errors?.['email']">Inserisci un'email valida.</span>
+        </div>
       </div>
 
       <div class="mb-3">
@@ -48,6 +57,13 @@
               <path d="M5.525 7.646a2.5 2.5 0 0 0 2.829 2.829zm4.95.708-2.829-2.83a2.5 2.5 0 0 1 2.829 2.829zm3.171 6-12-12 .708-.708 12 12z" />
             </svg>
           </button>
+        </div>
+        <div class="text-danger small mt-1"
+          *ngIf="registerFrom.get('password')?.touched && registerFrom.get('password')?.invalid">
+          <span *ngIf="registerFrom.get('password')?.errors?.['required']">La password è obbligatoria.</span>
+          <span *ngIf="registerFrom.get('password')?.errors?.['pattern']">
+            Almeno 8 caratteri con maiuscola, minuscola, numero e simbolo.
+          </span>
         </div>
       </div>
 
